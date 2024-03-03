@@ -7,15 +7,26 @@ document.addEventListener("DOMContentLoaded", function () {
   let secondNumber = "";
 
   function evaluatePair() {
-    if (operator === "+") {
-      return parseFloat(firstNumber) + parseFloat(secondNumber);
-    } else if (operator === "-") {
-      return parseFloat(firstNumber) - parseFloat(secondNumber);
-    } else if (operator === "*") {
-      return parseFloat(firstNumber) * parseFloat(secondNumber);
-    } else if (operator === "/") {
-      return parseFloat(firstNumber) / parseFloat(secondNumber);
+    let result;
+    switch (operator) {
+      case "+":
+        result = parseFloat(firstNumber) + parseFloat(secondNumber);
+        break;
+      case "-":
+        result = parseFloat(firstNumber) - parseFloat(secondNumber);
+        break;
+      case "*":
+        result = parseFloat(firstNumber) * parseFloat(secondNumber);
+        break;
+      case "/":
+        if (parseFloat(secondNumber) === 0) {
+          throw new Error("You can't divide by zero! Nice try though.");
+        }
+        result = parseFloat(firstNumber) / parseFloat(secondNumber);
+        break;
     }
+    // Round the result to 4 decimal places
+    return Math.round(result * 10000) / 10000;
   }
 
   buttons.forEach((button) => {
@@ -23,17 +34,23 @@ document.addEventListener("DOMContentLoaded", function () {
       const value = this.textContent;
 
       if (value === "=") {
-        if (firstNumber !== "" && operator !== "" && secondNumber !== "") {
-          const result = evaluatePair();
-          display.value = result;
-          // Reset variables for next pair calculation
-          firstNumber = result;
-          secondNumber = "";
+        try {
+          if (firstNumber !== "" && operator !== "" && secondNumber !== "") {
+            const result = evaluatePair();
+            display.value = result;
+            firstNumber = result;
+            secondNumber = "";
+            operator = "";
+          }
+        } catch (error) {
+          display.value = error.message;
+          currentInput = "";
+          firstNumber = "";
           operator = "";
+          secondNumber = "";
         }
       } else if (value === "c") {
         display.value = "";
-        // Reset all variables
         currentInput = "";
         firstNumber = "";
         operator = "";
@@ -42,75 +59,19 @@ document.addEventListener("DOMContentLoaded", function () {
         if (operator === "") {
           operator = value;
         } else {
-          const result = evaluatePair();
-          display.value = result;
-          // Set result as first number for next pair calculation
-          firstNumber = result;
-          secondNumber = "";
-          operator = value;
-        }
-      } else {
-        if (operator === "") {
-          firstNumber += value;
-          display.value = firstNumber;
-        } else {
-          secondNumber += value;
-          display.value = secondNumber;
-        }
-      }
-    });
-  });
-});
-document.addEventListener("DOMContentLoaded", function () {
-  const display = document.getElementById("display");
-  const buttons = document.querySelectorAll(".buttons button");
-  let currentInput = "";
-  let firstNumber = "";
-  let operator = "";
-  let secondNumber = "";
-
-  function evaluatePair() {
-    if (operator === "+") {
-      return parseFloat(firstNumber) + parseFloat(secondNumber);
-    } else if (operator === "-") {
-      return parseFloat(firstNumber) - parseFloat(secondNumber);
-    } else if (operator === "*") {
-      return parseFloat(firstNumber) * parseFloat(secondNumber);
-    } else if (operator === "/") {
-      return parseFloat(firstNumber) / parseFloat(secondNumber);
-    }
-  }
-
-  buttons.forEach((button) => {
-    button.addEventListener("click", function () {
-      const value = this.textContent;
-
-      if (value === "=") {
-        if (firstNumber !== "" && operator !== "" && secondNumber !== "") {
-          const result = evaluatePair();
-          display.value = result;
-          // Reset variables for next pair calculation
-          firstNumber = result;
-          secondNumber = "";
-          operator = "";
-        }
-      } else if (value === "c") {
-        display.value = "";
-        // Reset all variables
-        currentInput = "";
-        firstNumber = "";
-        operator = "";
-        secondNumber = "";
-      } else if ("+-*/".includes(value)) {
-        if (operator === "") {
-          operator = value;
-        } else {
-          const result = evaluatePair();
-          display.value = result;
-          // Set result as first number for next pair calculation
-          firstNumber = result;
-          secondNumber = "";
-          operator = value;
+          try {
+            const result = evaluatePair();
+            display.value = result;
+            firstNumber = result;
+            secondNumber = "";
+            operator = value;
+          } catch (error) {
+            display.value = error.message;
+            currentInput = "";
+            firstNumber = "";
+            operator = "";
+            secondNumber = "";
+          }
         }
       } else {
         if (operator === "") {
